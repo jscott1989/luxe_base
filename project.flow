@@ -1,0 +1,27 @@
+{
+  project: {
+    name: 'BasicTemplate',
+    version: '1.0.0',
+    author: 'Citizen of Melee',
+
+    app: {
+      name: 'basictemplate',
+      package: 'io.itch.citizenofmelee'
+    },
+
+    build: {
+      dependencies: {
+        luxe: '*',
+        mint : '*'
+      },
+      hxcpp: {
+        flags: ['-nocolor']
+      }
+    },
+
+    files : {
+      config: 'config.json',
+      assets: 'assets/'
+    }
+  }
+}
