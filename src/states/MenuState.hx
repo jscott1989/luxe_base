@@ -33,14 +33,14 @@ class MenuState extends State {
 
     new mint.Image({
         parent: canvas, name: 'logo',
-        x: 160, y:50, w:640, h:213,
+        x: Luxe.screen.mid.x - (640 / 2), y:50, w:640, h:213,
         path: 'assets/logo.png'
     });
 
     new mint.Button({
       parent: canvas,
       name: 'play_button',
-      x: 320, y: 295, w: 320, h: 64,
+      x: Luxe.screen.mid.x - (320 / 2), y: 295, w: 320, h: 64,
       text: 'Play Game',
       text_size: 28,
       options: { },
@@ -52,17 +52,17 @@ class MenuState extends State {
     new mint.Button({
       parent: canvas,
       name: 'options_button',
-      x: 320, y: 391, w: 320, h: 64,
+      x: Luxe.screen.mid.x - (320 / 2), y: 391, w: 320, h: 64,
       text: 'Options',
       text_size: 28,
       options: { },
-      // onclick: function(e,c) {Main.machine.set("game_state");}
+      onclick: function(e,c) {Main.debug("game_state");}
     });
 
     new mint.Button({
       parent: canvas,
       name: 'exit_button',
-      x: 320, y: 487, w: 320, h: 64,
+      x: Luxe.screen.mid.x - (320 / 2), y: 487, w: 320, h: 64,
       text: 'Exit',
       text_size: 28,
       options: { },
@@ -71,14 +71,15 @@ class MenuState extends State {
       }
     });
 
+    var title = Luxe.core.app.config.user.game.name;
+
     new mint.Label({
         parent: canvas,
         name: 'information',
-        x:0, y:608, w:960, h:32,
-        text: 'TEMPLATE is a game by Citizen of Mêlée',
+        x:0, y:Luxe.screen.h - 64, w:Luxe.screen.w, h:32,
+        text: title + ' is a game by Citizen of Mêlée',
         align:center,
-        text_size: 14,
-        onclick: function(_,_) { trace('hello mint!'); }
+        text_size: 14
     });
   }
 

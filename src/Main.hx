@@ -4,6 +4,7 @@ import luxe.Input;
 import luxe.States;
 import luxe.Vector;
 import luxe.Camera;
+import pgr.dconsole.DC;
 
 class Main extends luxe.Game {
   public static var machine : States;
@@ -18,17 +19,27 @@ class Main extends luxe.Game {
       }
     }
 
-    config.window.title = config.user.window.title;
+    config.window.title = config.user.game.name;
 
     config.preload.textures.push({ id:'assets/logo.png' });
 
     return config;
   }
 
+  public static function debug(str:String) {
+    // #if debug
+    DC.log(str);
+    // #end
+  }
+
   override function ready() {
+    // #if debug
+    DC.init();
+    // #end
 
     // Set up screen size
-    Luxe.camera.size = new Vector(960, 640);
+    Luxe.camera.size = new Vector(Luxe.core.app.config.user.window.width,
+                                  Luxe.core.app.config.user.window.height);
     Luxe.camera.size_mode = SizeMode.fit;
 
     connect_input();

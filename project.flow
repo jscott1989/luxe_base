@@ -12,10 +12,11 @@
     build: {
       dependencies: {
         luxe: '*',
-        mint : '*'
+        mint : '*',
+        dconsole : '*'
       },
       hxcpp: {
-        flags: ['-nocolor']
+        flags: []
       }
     },
 
