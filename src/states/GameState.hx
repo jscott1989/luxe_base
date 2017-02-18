@@ -1,30 +1,79 @@
 package states;
 import luxe.States;
-import luxe.Sprite;
-import luxe.Color;
-import luxe.Vector;
+import luxe.Text;
+import luxe.Input;
+import luxe.Input.GamepadEvent;
+import luxe.Ev;
 
 class GameState extends State {
-  var player: Sprite;
+  var text1: Text;
+  var text2: Text;
+  var text3: Text;
+  var text4: Text;
 
   public function new(name:String) {
     super({name:name});
   }
 
   override function onenter<T> (_:T) {
-    player = new Sprite({
-      name: 'player2',
-      pos: new Vector(64, 64),
-      color: new Color().rgb(0x00ffff),
-      size: new Vector(64, 64)
+    text1 = new Text({
+      text: '',
+      pos : Luxe.screen.mid.add_xyz(-100, -100, 0),
+      point_size : 18,
+      align: center,
+      align_vertical:center
+    });
+
+    text2 = new Text({
+      text: '',
+      pos : Luxe.screen.mid.add_xyz(100, -100, 0),
+      point_size : 18,
+      align: center,
+      align_vertical:center
+    });
+
+    text3 = new Text({
+      text: '',
+      pos : Luxe.screen.mid.add_xyz(100, 100, 0),
+      point_size : 18,
+      align: center,
+      align_vertical:center
+    });
+
+    text4 = new Text({
+      text: '',
+      pos : Luxe.screen.mid.add_xyz(100, 100, 0),
+      point_size : 18,
+      align: center,
+      align_vertical:center
     });
   }
 
   override function onleave<T> (_:T) {
-    player.destroy();
+    text1.destroy();
+    text2.destroy();
+    text3.destroy();
+    text4.destroy();
   }
 
   override function update( dt:Float ) {
-    
+    for (i in 1...5) {
+      var _text = "";
+      for (k in Main.default_controls.keys()) {
+        if(Luxe.input.inputdown(i + "." + k)) {
+          _text += k + " ";
+        }
+      }
+
+      if (i == 1) {
+        text1.text = _text;
+      } else if (i == 2) {
+        text2.text = _text;
+      } else if (i == 3) {
+        text3.text = _text;
+      } else if (i == 4) {
+        text4.text = _text;
+      }
+    }
   }
 }

@@ -9,6 +9,24 @@ import pgr.dconsole.DC;
 class Main extends luxe.Game {
   public static var machine : States;
 
+  public static var default_controls = [
+    'up'=>11,
+    'down'=>12,
+    'left'=>13,
+    'right'=>14,
+    'A'=>0,
+    'B'=>1,
+    'X'=>2,
+    'Y'=>3,
+    'LB'=>9,
+    'RB'=>10,
+    'back'=>4,
+    'home'=>5,
+    'start'=>6,
+    'l_press'=>7,
+    'r_press'=>8
+  ];
+
   override function config(config:luxe.GameConfig) {
     if(config.user.window != null) {
       if(config.user.window.width != null) {
@@ -50,22 +68,29 @@ class Main extends luxe.Game {
     machine.add(new GameState('game_state'));
 
     Luxe.on(init, function(_) {
-      machine.set('menu_state');
+      machine.set('game_state');
     });
 
   }
 
   function connect_input() {
     // Default keyboard configuration
-    Luxe.input.bind_key('up', Key.up);
-    Luxe.input.bind_key('up', Key.key_w);
-    Luxe.input.bind_key('right', Key.right);
-    Luxe.input.bind_key('right', Key.key_d);
-    Luxe.input.bind_key('down', Key.down);
-    Luxe.input.bind_key('down', Key.key_s);
-    Luxe.input.bind_key('left', Key.left);
-    Luxe.input.bind_key('left', Key.key_a);
-    Luxe.input.bind_key('space', Key.space);
+    Luxe.input.bind_key('1.up', Key.up);
+    Luxe.input.bind_key('1.up', Key.key_w);
+    Luxe.input.bind_key('1.right', Key.right);
+    Luxe.input.bind_key('1.right', Key.key_d);
+    Luxe.input.bind_key('1.down', Key.down);
+    Luxe.input.bind_key('1.down', Key.key_s);
+    Luxe.input.bind_key('1.left', Key.left);
+    Luxe.input.bind_key('1.left', Key.key_a);
+
+    // XBox 360 configuration
+    for (i in 0...4) {
+      var p = i + 1;
+      for (k in default_controls.keys()) {
+        Luxe.input.bind_gamepad(p + '.' + k, default_controls.get(k), i);
+      }
+    }
   }
 
 }
