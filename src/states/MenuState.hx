@@ -7,6 +7,7 @@ import luxe.Input;
 import luxe.Text;
 import lib.AutoCanvas;
 import mint.focus.Focus;
+import mint.layout.margins.Margins;
 import Sys;
 
 import mint.render.luxe.LuxeMintRender;
@@ -20,6 +21,10 @@ class MenuState extends State {
   }
 
   override function onenter<T> (_:T) {
+    Main.debug("Enter menu state");
+
+    var layout = new Margins();
+
     var a_canvas = new AutoCanvas(Luxe.camera.view, {
       name:'canvas',
       rendering: new LuxeMintRender(),
@@ -31,13 +36,15 @@ class MenuState extends State {
     canvas = a_canvas;
     var focus = new Focus(canvas);
 
-    new mint.Image({
+    var image = new mint.Image({
         parent: canvas, name: 'logo',
         x: Luxe.screen.mid.x - (640 / 2), y:50, w:640, h:213,
         path: 'assets/logo.png'
     });
 
-    new mint.Button({
+    layout.margin(image, top, fixed, 50);
+
+    var play_button = new mint.Button({
       parent: canvas,
       name: 'play_button',
       x: Luxe.screen.mid.x - (320 / 2), y: 295, w: 320, h: 64,
@@ -49,20 +56,31 @@ class MenuState extends State {
       }
     });
 
-    new mint.Button({
+    layout.margin(play_button, image, top, fixed, image.h + 40);
+
+    #if (CONTROLLERS > 0)
+    // For now the only option we have is controls
+    // so if it's mouse/keyboard only we don't show options
+    var options_button = new mint.Button({
       parent: canvas,
       name: 'options_button',
       x: Luxe.screen.mid.x - (320 / 2), y: 391, w: 320, h: 64,
       text: 'Options',
       text_size: 28,
       options: { },
-      onclick: function(e,c) {Main.debug("game_state");}
+      onclick: function(e,c) {
+        Main.machine.set("options_state");
+      }
     });
 
-    new mint.Button({
+    layout.margin(options_button, play_button, left, fixed, 0);
+    layout.margin(options_button, play_button, top, fixed, play_button.h + 25);
+    #end
+
+    var exit_button = new mint.Button({
       parent: canvas,
       name: 'exit_button',
-      x: Luxe.screen.mid.x - (320 / 2), y: 487, w: 320, h: 64,
+      x: Luxe.screen.mid.x - (320 / 2), y: 0, w: 320, h: 64,
       text: 'Exit',
       text_size: 28,
       options: { },
@@ -70,6 +88,14 @@ class MenuState extends State {
         Sys.exit(0);
       }
     });
+
+    #if (CONTROLLERS > 0)
+      layout.margin(exit_button, options_button, left, fixed, 0);
+      layout.margin(exit_button, options_button, top, fixed, options_button.h + 25);
+    #else
+      layout.margin(exit_button, play_button, left, fixed, 0);
+      layout.margin(exit_button, play_button, top, fixed, play_button.h + 25);
+    #end
 
     var title = Luxe.core.app.config.user.game.name;
 
@@ -84,6 +110,7 @@ class MenuState extends State {
   }
 
   override function onleave<T> (_:T) {
+    Main.debug("Leave menu state");
     canvas.destroy();
   }
 

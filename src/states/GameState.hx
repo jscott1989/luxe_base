@@ -16,6 +16,7 @@ class GameState extends State {
   }
 
   override function onenter<T> (_:T) {
+    Main.debug("Enter game state");
     text1 = new Text({
       text: '',
       pos : Luxe.screen.mid.add_xyz(-100, -100, 0),
@@ -50,6 +51,7 @@ class GameState extends State {
   }
 
   override function onleave<T> (_:T) {
+    Main.debug("Leave game state");
     text1.destroy();
     text2.destroy();
     text3.destroy();

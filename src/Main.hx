@@ -5,6 +5,7 @@ import luxe.States;
 import luxe.Vector;
 import luxe.Camera;
 import pgr.dconsole.DC;
+import lib.MacroUtils;
 
 class Main extends luxe.Game {
   public static var machine : States;
@@ -45,15 +46,16 @@ class Main extends luxe.Game {
   }
 
   public static function debug(str:String) {
-    // #if debug
+    #if debug
     DC.log(str);
-    // #end
+    #end
   }
 
   override function ready() {
-    // #if debug
+    #if debug
     DC.init();
-    // #end
+    debug(Luxe.core.app.config.user.game.name + " starting.");
+    #end
 
     // Set up screen size
     Luxe.camera.size = new Vector(Luxe.core.app.config.user.window.width,
@@ -65,27 +67,28 @@ class Main extends luxe.Game {
 
     // Set up game states
     machine.add(new MenuState('menu_state'));
+    machine.add(new OptionsState('options_state'));
+    machine.add(new ControlsState('controls_state'));
     machine.add(new GameState('game_state'));
 
     Luxe.on(init, function(_) {
-      machine.set('game_state');
+      machine.set('menu_state');
     });
 
   }
 
   function connect_input() {
     // Default keyboard configuration
-    Luxe.input.bind_key('1.up', Key.up);
+
+    #if (CONTROLLERS > 0)
     Luxe.input.bind_key('1.up', Key.key_w);
-    Luxe.input.bind_key('1.right', Key.right);
-    Luxe.input.bind_key('1.right', Key.key_d);
-    Luxe.input.bind_key('1.down', Key.down);
     Luxe.input.bind_key('1.down', Key.key_s);
-    Luxe.input.bind_key('1.left', Key.left);
     Luxe.input.bind_key('1.left', Key.key_a);
+    Luxe.input.bind_key('1.right', Key.key_d);
+    #end
 
     // XBox 360 configuration
-    for (i in 0...4) {
+    for (i in 0...Std.parseInt(MacroUtils.getDefinedValue("CONTROLLERS", "0"))) {
       var p = i + 1;
       for (k in default_controls.keys()) {
         Luxe.input.bind_gamepad(p + '.' + k, default_controls.get(k), i);
