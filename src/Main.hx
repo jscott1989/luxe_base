@@ -1,32 +1,13 @@
 import states.*;
 import luxe.GameConfig;
-import luxe.Input;
 import luxe.States;
 import luxe.Vector;
 import luxe.Camera;
 import pgr.dconsole.DC;
-import lib.MacroUtils;
+import haxe.Json;
 
 class Main extends luxe.Game {
   public static var machine : States;
-
-  public static var default_controls = [
-    'up'=>11,
-    'down'=>12,
-    'left'=>13,
-    'right'=>14,
-    'A'=>0,
-    'B'=>1,
-    'X'=>2,
-    'Y'=>3,
-    'LB'=>9,
-    'RB'=>10,
-    'back'=>4,
-    'home'=>5,
-    'start'=>6,
-    'l_press'=>7,
-    'r_press'=>8
-  ];
 
   override function config(config:luxe.GameConfig) {
     if(config.user.window != null) {
@@ -45,10 +26,25 @@ class Main extends luxe.Game {
     return config;
   }
 
-  public static function debug(str:String) {
+  public static function debug(data:Dynamic, color:Int = -1) {
     #if debug
-    DC.log(str);
+    DC.log(data, color);
     #end
+  }
+
+  override function onevent(event:snow.types.Types.SystemEvent) {
+    // The gamepad connected/disconnected messages get sent before Luxe is ready
+    // so we intercept them here instead
+    if(event.type == se_input && event.input != null && event.input.type == ie_gamepad) {
+      if(event.input.gamepad.type == ge_device) {
+        switch(event.input.gamepad.device_event) {
+          case ge_device_added:       Controls.device_added(event.input.gamepad);
+          case ge_device_removed:     Controls.device_removed(event.input.gamepad);
+          case ge_device_remapped:    debug('remapped ${event.input.gamepad.device_id}');
+          case _:
+        }
+      }
+    }
   }
 
   override function ready() {
@@ -62,38 +58,42 @@ class Main extends luxe.Game {
                                   Luxe.core.app.config.user.window.height);
     Luxe.camera.size_mode = SizeMode.fit;
 
-    connect_input();
     machine = new States({ name:'statemachine' });
 
     // Set up game states
     machine.add(new MenuState('menu_state'));
     machine.add(new OptionsState('options_state'));
+    machine.add(new InitialControlsState('initial_controls_state'));
     machine.add(new ControlsState('controls_state'));
+    machine.add(new ConfigureControllerState('configure_controller_state'));
     machine.add(new GameState('game_state'));
 
     Luxe.on(init, function(_) {
-      machine.set('menu_state');
-    });
+      #if (CONTROLLERS>0)
+      // We only care about configuration if we have controls
+      var controls_str = Luxe.core.app.io.string_load("controls");
 
-  }
+      if (controls_str == null) {
+        Main.debug("No controls set.");
 
-  function connect_input() {
-    // Default keyboard configuration
-
-    #if (CONTROLLERS > 0)
-    Luxe.input.bind_key('1.up', Key.key_w);
-    Luxe.input.bind_key('1.down', Key.key_s);
-    Luxe.input.bind_key('1.left', Key.key_a);
-    Luxe.input.bind_key('1.right', Key.key_d);
-    #end
-
-    // XBox 360 configuration
-    for (i in 0...Std.parseInt(MacroUtils.getDefinedValue("CONTROLLERS", "0"))) {
-      var p = i + 1;
-      for (k in default_controls.keys()) {
-        Luxe.input.bind_gamepad(p + '.' + k, default_controls.get(k), i);
+        if (Controls.connected_gamepads() > 0) {
+          // A decision needs to be made
+          Main.debug("Gamepads connected. Configuring controls.");
+          machine.set('initial_controls_state');
+        } else {
+          Main.debug("No gamepads connected. Setting default controls.");
+          Controls.set_default_keyboard_controls();
+          machine.set('menu_state');
+        }
+      } else {
+        Controls.connect_input(Json.parse(controls_str));
+        Main.debug("Controls set. Loading.");
+        Main.debug(controls_str);
+        machine.set('menu_state');
       }
-    }
+      #else
+        machine.set('menu_state');
+      #end
+    });
   }
-
 }

@@ -52,11 +52,11 @@ class ControlsState extends State {
         parent: canvas,
         name: 'controller_button+' + i,
         x: Luxe.screen.mid.x - (320 / 2), y: 0, w: 320, h: 64,
-        text: 'Controller ' + p,
+        text: 'Player ' + p,
         text_size: 28,
         options: { },
         onclick: function(_, _) {
-          Main.machine.set("configure_controller_state");
+          Main.machine.set("configure_controller_state", i);
         }
       });
 
@@ -84,7 +84,7 @@ class ControlsState extends State {
   }
 
   override function onleave<T> (_:T) {
-    Main.debug("Leave options state");
+    Main.debug("Leave controls state");
     canvas.destroy();
   }
 

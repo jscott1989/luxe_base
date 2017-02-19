@@ -2,7 +2,18 @@
   "game": {
     "name": "TEMPLATE"
   },
-  
+
+  "controls": {
+    "up": "Up",
+    "down": "Down",
+    "left": "Left",
+    "right": "Right",
+    "x": "Shoot",
+    "a": "Confirm",
+    "b": "Cancel",
+    "start": "Pause"
+  },
+
   "window": {
     "width": 960,
     "height": 640

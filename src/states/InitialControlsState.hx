@@ -8,10 +8,11 @@ import luxe.Text;
 import lib.AutoCanvas;
 import mint.focus.Focus;
 import mint.layout.margins.Margins;
+import lib.MacroUtils;
 
 import mint.render.luxe.LuxeMintRender;
 
-class OptionsState extends State {
+class InitialControlsState extends State {
 
   var canvas: mint.Canvas;
 
@@ -20,7 +21,7 @@ class OptionsState extends State {
   }
 
   override function onenter<T> (_:T) {
-    Main.debug("Enter options state");
+    Main.debug("Enter initial controls state");
     var layout = new Margins();
 
     var a_canvas = new AutoCanvas(Luxe.camera.view, {
@@ -38,46 +39,56 @@ class OptionsState extends State {
         parent: canvas,
         name: 'title',
         x:0, y:30, w:Luxe.screen.w, h:64,
-        text: 'Options',
+        text: 'Controls',
         align:center,
         text_size: 56
     });
 
-    var controls_button = new mint.Button({
+    var intro = new mint.Label({
+        parent: canvas,
+        name: 'intro',
+        x:0, y:30, w:Luxe.screen.w, h:64,
+        text: 'Select your default control method. You can change this under the options menu',
+        align:center,
+        text_size: 20
+    });
+
+    layout.margin(intro, title, top, fixed, title.h + 50);
+
+    var keyboard_button = new mint.Button({
       parent: canvas,
-      name: 'controls_button',
-      x: Luxe.screen.mid.x - (320 / 2), y: 0, w: 320, h: 64,
-      text: 'Controls',
+      name: 'keyboard_button',
+      x: Luxe.screen.mid.x - (320 + 50), y: 295, w: 320, h: 64,
+      text: 'Keyboard',
       text_size: 28,
       options: { },
       onclick: function(_, _) {
-        #if (CONTROLLERS==1)
-          Main.machine.set("configure_controller_state");
-        #else
-          Main.machine.set("controls_state");
-        #end
+        Controls.set_default_keyboard_controls();
+        Main.machine.set('menu_state');
       }
     });
 
-    layout.margin(controls_button, title, top, fixed, title.h + 200);
 
-    var back_button = new mint.Button({
+    layout.margin(keyboard_button, intro, top, fixed, intro.h + 200);
+
+    var gamepad_button = new mint.Button({
       parent: canvas,
-      name: 'back_button',
-      x: Luxe.screen.mid.x - (320 / 2), y: 0, w: 320, h: 64,
-      text: 'Back',
+      name: 'gamepad_button',
+      x: Luxe.screen.mid.x + 50, y: 295, w: 320, h: 64,
+      text: 'Gamepad',
       text_size: 28,
       options: { },
       onclick: function(_, _) {
-        Main.machine.set("menu_state");
+        Controls.set_default_gamepad_controls();
+        Main.machine.set('menu_state');
       }
     });
 
-    layout.margin(back_button, controls_button, top, fixed, controls_button.h + 25);
+    layout.margin(gamepad_button, keyboard_button, top, fixed, 0);
   }
 
   override function onleave<T> (_:T) {
-    Main.debug("Leave options state");
+    Main.debug("Leave initial controls state");
     canvas.destroy();
   }
 

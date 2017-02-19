@@ -61,7 +61,7 @@ class GameState extends State {
   override function update( dt:Float ) {
     for (i in 1...5) {
       var _text = "";
-      for (k in Main.default_controls.keys()) {
+      for (k in Controls.default_controls.get("keyboard").keys()) {
         if(Luxe.input.inputdown(i + "." + k)) {
           _text += k + " ";
         }
