@@ -3,16 +3,16 @@
     "name": "TEMPLATE"
   },
 
-  "controls": {
-    "up": "Up",
-    "down": "Down",
-    "left": "Left",
-    "right": "Right",
-    "x": "Shoot",
-    "a": "Confirm",
-    "b": "Cancel",
-    "start": "Pause"
-  },
+  "controls": [
+    ["Up", "up"],
+    ["Down", "down"],
+    ["Left", "left"],
+    ["Right", "right"],
+    ["Shoot", "x"],
+    ["Confirm", "a"],
+    ["Cancel", "b"],
+    ["Pause", "start"]
+  ],
 
   "window": {
     "width": 960,

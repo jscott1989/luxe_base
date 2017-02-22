@@ -9,6 +9,7 @@ import lib.AutoCanvas;
 import mint.focus.Focus;
 import mint.layout.margins.Margins;
 import lib.MacroUtils;
+import snow.systems.input.Keycodes;
 
 import mint.render.luxe.LuxeMintRender;
 
@@ -16,6 +17,10 @@ class ConfigureControllerState extends State {
 
   var canvas: mint.Canvas;
   var configuration: Map<String, Int>;
+
+  private var highlightedButtons = new Array<String>();
+  private var bindingButton:String = null;
+  private var actionButtons = new Map<String, mint.Button>();
 
   public function new(name:String) {
     super({ name:name });
@@ -29,6 +34,14 @@ class ConfigureControllerState extends State {
       case Controls.GAMEPAD: return "Gamepad " + (p + 1);
       default: return "Input Device";
     }
+  }
+
+  private function action_mapped_text(action:String) {
+    if (configuration.get("type") == Controls.KEYBOARD) {
+      var p = configuration.get(action);
+      return Keycodes.name(p).toUpperCase();
+    }
+    return "Unknown";
   }
 
   override function onenter<T> (c:T) {
@@ -82,8 +95,10 @@ class ConfigureControllerState extends State {
         parent: input_device, text: 'Keyboard', align: left,
         name: 'input_device_keyboard', w:200, h:32, text_size: 14,
         onclick: function(_, _) {
-          configuration.set("type", Controls.KEYBOARD);
-          input_device.label.text = input_device_label_text();
+          if (bindingButton == null) {
+            configuration.set("type", Controls.KEYBOARD);
+            input_device.label.text = input_device_label_text();
+          }
         }
       }),
       10, 0
@@ -99,9 +114,11 @@ class ConfigureControllerState extends State {
           parent: input_device, text: 'Gamepad ' + p, align: left,
           name: 'input_device_gamepad_' + i, w:200, h:32, text_size: 14,
           onclick: function(_, _) {
-            configuration.set("type", Controls.GAMEPAD);
-            configuration.set("gamepad_id", i);
-            input_device.label.text = input_device_label_text();
+            if (bindingButton == null) {
+              configuration.set("type", Controls.GAMEPAD);
+              configuration.set("gamepad_id", i);
+              input_device.label.text = input_device_label_text();
+            }
           }
         }),
         10, 0
@@ -115,6 +132,39 @@ class ConfigureControllerState extends State {
         input_device_label.h + 20, w:(320 + 50) * 2, h:320,
     });
 
+    var scroll = new mint.Scroll({
+      parent: panel,
+      name: 'scroll',
+      x:0, y:0, w:panel.w, h:panel.h,
+    });
+
+    var yoffset:Float = 0;
+    for (k in Controls.get_ordered_controls()) {
+      // k[0] is the action name, k[1] is the default binding
+      var lbl = new mint.Label({
+        parent:scroll, text: k[0], align: left,
+        name: 'lbl_' + k[0], w: 200, h:32, text_size: 14, x: 0, y: yoffset
+      });
+
+      var btn = new mint.Button({
+        parent:scroll, text: action_mapped_text(k[1]), align: left,
+        name: 'btn_' + k[0], w: 200, h:32, text_size: 14, x: 300, y: yoffset,
+        onclick: function(_, ctrl) {
+          if (bindingButton == null) {
+            var b: mint.render.luxe.Button = cast actionButtons[k[1]].renderer;
+            b.color =  new Color().rgb(0xff0000);
+            b.color_hover =  new Color().rgb(0xff0000);
+            b.color_down =  new Color().rgb(0xff0000);
+            b.visual.color =  new Color().rgb(0xff0000);
+
+            actionButtons.get(k[1]).label.text = "Waiting...";
+            bindingButton = k[1];
+          }
+        }
+      });
+      actionButtons.set(k[1], btn);
+      yoffset += lbl.h + 10;
+    }
 
     var cancel_button = new mint.Button({
       parent: canvas,
@@ -146,7 +196,52 @@ class ConfigureControllerState extends State {
     canvas.destroy();
   }
 
-  override function update(dt:Float) {
+  override function onkeydown( e:KeyEvent ) {
+    if (configuration.get("type") == Controls.KEYBOARD) {
+      if (bindingButton != null) {
+        configuration.set(bindingButton, e.keycode);
+        actionButtons[bindingButton].label.text = action_mapped_text(bindingButton);
+        var b: mint.render.luxe.Button = cast actionButtons[bindingButton].renderer;
+        b.color = new Color().rgb(0x373737);
+        b.color_hover = new Color().rgb(0x445158);
+        b.color_down = new Color().rgb(0x444444);
+        b.visual.color = new Color().rgb(0x373737);
+        bindingButton = null;
+      } else {
+        // If the keypress matches a configured input, highlight it
+        for (k in configuration.keys()) {
+          if (configuration.get(k) == e.keycode) {
+            if (!(highlightedButtons.indexOf(k) > -1)) {
+              highlightedButtons.push(k);
+              var b: mint.render.luxe.Button = cast actionButtons[k].renderer;
+              b.color =  new Color().rgb(0x0000ff);
+              b.color_hover =  new Color().rgb(0x0000ff);
+              b.color_down =  new Color().rgb(0x0000ff);
+              b.visual.color =  new Color().rgb(0x0000ff);
+            }
+            return;
+          }
+        }
+      }
+    }
+  }
 
+  override function onkeyup( e:KeyEvent ) {
+    for (k in configuration.keys()) {
+      if (configuration.get(k) == e.keycode) {
+        if (highlightedButtons.indexOf(k) > -1) {
+          var b: mint.render.luxe.Button = cast actionButtons[k].renderer;
+          b.color = new Color().rgb(0x373737);
+          b.color_hover = new Color().rgb(0x445158);
+          b.color_down = new Color().rgb(0x444444);
+          b.visual.color = new Color().rgb(0x373737);
+          highlightedButtons.remove(k);
+        }
+        return;
+      }
+    }
+  }
+
+  override function update(dt:Float) {
   }
 }

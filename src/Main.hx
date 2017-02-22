@@ -53,6 +53,8 @@ class Main extends luxe.Game {
     debug(Luxe.core.app.config.user.game.name + " starting.");
     #end
 
+    Controls.init();
+
     // Set up screen size
     Luxe.camera.size = new Vector(Luxe.core.app.config.user.window.width,
                                   Luxe.core.app.config.user.window.height);

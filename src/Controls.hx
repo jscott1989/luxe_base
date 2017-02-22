@@ -72,6 +72,13 @@ class Controls {
     _connected_gamepads -= 1;
   }
 
+  public static function get_ordered_controls() {
+    var ctrls:Array<Array<String>> = cast Luxe.core.app.config.user.controls;
+    return ctrls;
+  }
+
+
+
   public static function load_configuration(controller_id: Int) {
     var controls_str = Luxe.core.app.io.string_load("controls");
     if (controls_str == null) {
@@ -139,6 +146,19 @@ class Controls {
           connect_gamepad_input(i + 1, controls[i]);
         }
       }
+    }
+  }
+
+  private static var actions_map = new Map<String, String>();
+
+  public static function get_button_for_action(action:String) {
+    return actions_map.get(action);
+  }
+
+  public static function init() {
+    var ctrls:Array<Array<String>> = cast Luxe.core.app.config.user.controls;
+    for (c in ctrls) {
+      actions_map.set(c[0], c[1]);
     }
   }
 }
