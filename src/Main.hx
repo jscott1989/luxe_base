@@ -88,9 +88,9 @@ class Main extends luxe.Game {
           machine.set('menu_state');
         }
       } else {
-        Controls.connect_input(Json.parse(controls_str));
         Main.debug("Controls set. Loading.");
         Main.debug(controls_str);
+        Controls.connect_input();
         machine.set('menu_state');
       }
       #else

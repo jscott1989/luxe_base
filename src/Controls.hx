@@ -97,8 +97,6 @@ class Controls {
     return ctrls;
   }
 
-
-
   public static function load_configuration(controller_id: Int) {
     var controls_str = Luxe.core.app.io.string_load("controls");
     if (controls_str == null) {
@@ -138,7 +136,7 @@ class Controls {
       controls.push(generate_gamepad_controls(i));
     }
     save_configuration(controls);
-    connect_input(controls);
+    connect_input();
   }
 
   public static function set_default_gamepad_controls() {
@@ -148,27 +146,29 @@ class Controls {
       controls.push(generate_gamepad_controls(i));
     }
     save_configuration(controls);
-    connect_input(controls);
+    connect_input();
   }
 
   static function connect_keyboard_input(i: Int, control: Map<String, Int>) {
-    for (k in control.keys()) {
-      if (k != "type") {
-        Luxe.input.bind_key(i + '.' + k, control.get(k));
-      }
+    for (k in actions_map.keys()) {
+      Luxe.input.bind_key(i + '.' + k, control.get(actions_map.get(k)));
     }
   }
 
   static function connect_gamepad_input(i: Int, control: Map<String, Int>) {
     var gamepad_id = control.get("gamepad_id");
-    for (k in control.keys()) {
-      if (k != "type" && k != "gamepad_id") {
-        Luxe.input.bind_gamepad(i + '.' + k, control.get(k), gamepad_id);
-      }
+    for (k in actions_map.keys()) {
+      Luxe.input.bind_gamepad(i + '.' + k, control.get(actions_map.get(k)), gamepad_id);
     }
   }
 
-  public static function connect_input(controls: Array<Map<String, Int>>) {
+  public static function connect_input() {
+    var controls_str = Luxe.core.app.io.string_load("controls");
+    var controls: Array<Map<String, Int>> = Json.parse(controls_str);
+
+    Luxe.input.key_bindings = new Map();
+    Luxe.input.gamepad_bindings = new Map();
+
     for (i in 0...controls.length) {
       if (controls[i] != null) {
         if (controls[i].get("type") == KEYBOARD) {
@@ -180,7 +180,7 @@ class Controls {
     }
   }
 
-  private static var actions_map = new Map<String, String>();
+  public static var actions_map = new Map<String, String>();
 
   public static function get_button_for_action(action:String) {
     return actions_map.get(action);

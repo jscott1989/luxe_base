@@ -4,6 +4,7 @@ import luxe.Text;
 import luxe.Input;
 import luxe.Input.GamepadEvent;
 import luxe.Ev;
+import haxe.Json;
 
 class GameState extends State {
   var text1: Text;
@@ -17,6 +18,7 @@ class GameState extends State {
 
   override function onenter<T> (_:T) {
     Main.debug("Enter game state");
+
     text1 = new Text({
       text: '',
       pos : Luxe.screen.mid.add_xyz(-100, -100, 0),
@@ -61,7 +63,8 @@ class GameState extends State {
   override function update( dt:Float ) {
     for (i in 1...5) {
       var _text = "";
-      for (k in Controls.default_controls.get("keyboard").keys()) {
+
+      for (k in Controls.actions_map.keys()) {
         if(Luxe.input.inputdown(i + "." + k)) {
           _text += k + " ";
         }
