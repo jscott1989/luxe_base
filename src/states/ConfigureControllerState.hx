@@ -14,7 +14,7 @@ import snow.systems.input.Keycodes;
 import mint.render.luxe.LuxeMintRender;
 
 class ConfigureControllerState extends State {
-
+  var controller_id:Int;
   var canvas: mint.Canvas;
   var configuration: Map<String, Int>;
 
@@ -22,8 +22,39 @@ class ConfigureControllerState extends State {
   private var bindingButton:String = null;
   private var actionButtons = new Map<String, mint.Button>();
 
+
+  // Interface elements
+  var input_device:mint.Dropdown;
+
   public function new(name:String) {
     super({ name:name });
+  }
+
+  /**
+   * Update interface elements so they line up with the configuration.
+   */
+  public function refresh_interface() {
+    input_device.label.text = input_device_label_text();
+
+    for (bindingButton in actionButtons.keys()) {
+      actionButtons[bindingButton].label.text = action_mapped_text(bindingButton);
+    }
+  }
+
+  function set_default_button_colours(btn:mint.Button) {
+    var b: mint.render.luxe.Button = cast btn.renderer;
+    b.color = new Color().rgb(0x373737);
+    b.color_hover = new Color().rgb(0x445158);
+    b.color_down = new Color().rgb(0x444444);
+    b.visual.color = new Color().rgb(0x373737);
+  }
+
+  function set_highlight_button_colours(btn:mint.Button, color:Color) {
+    var b: mint.render.luxe.Button = cast btn.renderer;
+    b.color = color;
+    b.color_hover = color;
+    b.color_down = color;
+    b.visual.color = color;
   }
 
   private function input_device_label_text() {
@@ -41,11 +72,16 @@ class ConfigureControllerState extends State {
       var p = configuration.get(action);
       return Keycodes.name(p).toUpperCase();
     }
-    return "Unknown";
+    // For now we just assume it's a 360 controller. TODO MORE CONTROLLERS
+    var c = Controls.control_names.get("360").get(configuration.get(action));
+    if (c == null) {
+      return "UNKNOWN BUTTON";
+    }
+    return c.toUpperCase();
   }
 
   override function onenter<T> (c:T) {
-    var controller_id:Int = cast c;
+    controller_id = cast c;
     Main.debug("Enter configure controller state");
     var layout = new Margins();
 
@@ -84,7 +120,7 @@ class ConfigureControllerState extends State {
 
     layout.margin(input_device_label, title, top, fixed, title.h + 50);
 
-    var input_device = new mint.Dropdown({
+    input_device = new mint.Dropdown({
       parent: canvas,
       name: 'input_device', text: input_device_label_text(),
       x:input_device_label.x + input_device_label.w, y:input_device_label.y + 2, w:260, h:32,
@@ -97,7 +133,7 @@ class ConfigureControllerState extends State {
         onclick: function(_, _) {
           if (bindingButton == null) {
             configuration.set("type", Controls.KEYBOARD);
-            input_device.label.text = input_device_label_text();
+            refresh_interface();
           }
         }
       }),
@@ -117,7 +153,7 @@ class ConfigureControllerState extends State {
             if (bindingButton == null) {
               configuration.set("type", Controls.GAMEPAD);
               configuration.set("gamepad_id", i);
-              input_device.label.text = input_device_label_text();
+              refresh_interface();
             }
           }
         }),
@@ -151,11 +187,7 @@ class ConfigureControllerState extends State {
         name: 'btn_' + k[0], w: 200, h:32, text_size: 14, x: 300, y: yoffset,
         onclick: function(_, ctrl) {
           if (bindingButton == null) {
-            var b: mint.render.luxe.Button = cast actionButtons[k[1]].renderer;
-            b.color =  new Color().rgb(0xff0000);
-            b.color_hover =  new Color().rgb(0xff0000);
-            b.color_down =  new Color().rgb(0xff0000);
-            b.visual.color =  new Color().rgb(0xff0000);
+            set_highlight_button_colours(actionButtons[k[1]], new Color().rgb(0xff0000));
 
             actionButtons.get(k[1]).label.text = "Waiting...";
             bindingButton = k[1];
@@ -186,55 +218,51 @@ class ConfigureControllerState extends State {
       text_size: 28,
       options: { },
       onclick: function(_, _) {
+        Controls.save_controller_configuration(controller_id, configuration);
         Main.machine.set("controls_state");
       }
     });
+
+    //Luxe.core.on(luxe.Ev.gamepaddown, ongamepaddown);
+    //Luxe.core.on(luxe.Ev.gamepadup, ongamepadup);
+
+    refresh_interface();
   }
 
   override function onleave<T> (_:T) {
     Main.debug("Leave configure controller state");
+
+    //Luxe.core.off(luxe.Ev.gamepaddown, ongamepaddown);
+    //Luxe.core.off(luxe.Ev.gamepadup, ongamepadup);
+
     canvas.destroy();
   }
 
-  override function onkeydown( e:KeyEvent ) {
-    if (configuration.get("type") == Controls.KEYBOARD) {
-      if (bindingButton != null) {
-        configuration.set(bindingButton, e.keycode);
-        actionButtons[bindingButton].label.text = action_mapped_text(bindingButton);
-        var b: mint.render.luxe.Button = cast actionButtons[bindingButton].renderer;
-        b.color = new Color().rgb(0x373737);
-        b.color_hover = new Color().rgb(0x445158);
-        b.color_down = new Color().rgb(0x444444);
-        b.visual.color = new Color().rgb(0x373737);
-        bindingButton = null;
-      } else {
-        // If the keypress matches a configured input, highlight it
-        for (k in configuration.keys()) {
-          if (configuration.get(k) == e.keycode) {
-            if (!(highlightedButtons.indexOf(k) > -1)) {
-              highlightedButtons.push(k);
-              var b: mint.render.luxe.Button = cast actionButtons[k].renderer;
-              b.color =  new Color().rgb(0x0000ff);
-              b.color_hover =  new Color().rgb(0x0000ff);
-              b.color_down =  new Color().rgb(0x0000ff);
-              b.visual.color =  new Color().rgb(0x0000ff);
-            }
-            return;
+  function button_press(buttonCode:Int) {
+    if (bindingButton != null) {
+      configuration.set(bindingButton, buttonCode);
+      set_default_button_colours(actionButtons[bindingButton]);
+      refresh_interface();
+      bindingButton = null;
+    } else {
+      // If the code matches a configured input, highlight it
+      for (k in configuration.keys()) {
+        if (configuration.get(k) == buttonCode) {
+          if (!(highlightedButtons.indexOf(k) > -1)) {
+            highlightedButtons.push(k);
+            set_highlight_button_colours(actionButtons[k], new Color().rgb(0x0000ff));
           }
+          return;
         }
       }
     }
   }
 
-  override function onkeyup( e:KeyEvent ) {
+  function button_release(buttonCode:Int) {
     for (k in configuration.keys()) {
-      if (configuration.get(k) == e.keycode) {
+      if (configuration.get(k) == buttonCode) {
         if (highlightedButtons.indexOf(k) > -1) {
-          var b: mint.render.luxe.Button = cast actionButtons[k].renderer;
-          b.color = new Color().rgb(0x373737);
-          b.color_hover = new Color().rgb(0x445158);
-          b.color_down = new Color().rgb(0x444444);
-          b.visual.color = new Color().rgb(0x373737);
+          set_default_button_colours(actionButtons[k]);
           highlightedButtons.remove(k);
         }
         return;
@@ -242,6 +270,25 @@ class ConfigureControllerState extends State {
     }
   }
 
-  override function update(dt:Float) {
+  override function onkeydown( e:KeyEvent ) {
+    if (configuration.get("type") == Controls.KEYBOARD) {
+      button_press(e.keycode);
+    }
+  }
+
+  override function onkeyup( e:KeyEvent ) {
+    button_release(e.keycode);
+  }
+
+  override function ongamepaddown(e:GamepadEvent) {
+      if (configuration.get("type") == Controls.GAMEPAD && configuration.get("gamepad_id") == e.gamepad) {
+        button_press(e.button);
+      }
+  }
+
+  override function ongamepadup(e:GamepadEvent) {
+    if (configuration.get("type") == Controls.GAMEPAD && configuration.get("gamepad_id") == e.gamepad) {
+      button_release(e.button);
+    }
   }
 }

@@ -47,6 +47,26 @@ class Controls {
     ]
   ];
 
+  public static var control_names = [
+    '360' => [
+      11 => 'UP',
+      12 => 'DOWN',
+      13 => 'LEFT',
+      14 => 'RIGHT',
+      0 => 'A',
+      1 => 'B',
+      2 => 'X',
+      3 => 'Y',
+      9 => 'LB',
+      10 => 'RB',
+      4 => 'back',
+      5 => 'home',
+      6 => 'start',
+      7 => 'l_press',
+      8 => 'r_press'
+    ]
+  ];
+
   static var _connected_gamepads = 0;
 
   public static function connected_gamepads() {
@@ -87,6 +107,19 @@ class Controls {
     return Json.parse(controls_str)[controller_id];
   }
 
+  public static function save_configuration(controls: Array<Map<String, Int>>) {
+    Main.debug("Saving controls.");
+    Main.debug(Json.stringify(controls, null, " "));
+    Luxe.core.app.io.string_save("controls", Json.stringify(controls));
+  }
+
+  public static function save_controller_configuration(controller_id: Int, config: Map<String, Int>) {
+    var controls_str = Luxe.core.app.io.string_load("controls");
+    var controls = Json.parse(controls_str);
+    controls[controller_id] = config;
+    save_configuration(controls);
+  }
+
   private static function generate_gamepad_controls(gamepad_id: Int) {
     var controls = new Map<String, Int>();
     // TODO, support other controller types
@@ -104,8 +137,7 @@ class Controls {
     for (i in 0...(Std.parseInt(MacroUtils.getDefinedValue("CONTROLLERS", "0")) - 1)) {
       controls.push(generate_gamepad_controls(i));
     }
-    Main.debug(Json.stringify(controls, null, " "));
-    Luxe.core.app.io.string_save("controls", Json.stringify(controls));
+    save_configuration(controls);
     connect_input(controls);
   }
 
@@ -115,8 +147,7 @@ class Controls {
     for (i in 0...Std.parseInt(MacroUtils.getDefinedValue("CONTROLLERS", "0"))) {
       controls.push(generate_gamepad_controls(i));
     }
-    Main.debug(Json.stringify(controls, null, " "));
-    Luxe.core.app.io.string_save("controls", Json.stringify(controls));
+    save_configuration(controls);
     connect_input(controls);
   }
 
