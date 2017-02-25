@@ -249,8 +249,10 @@ class ConfigureControllerState extends State {
       for (k in configuration.keys()) {
         if (configuration.get(k) == buttonCode) {
           if (!(highlightedButtons.indexOf(k) > -1)) {
-            highlightedButtons.push(k);
-            set_highlight_button_colours(actionButtons[k], new Color().rgb(0x0000ff));
+            if (actionButtons.exists(k)) {
+              highlightedButtons.push(k);
+              set_highlight_button_colours(actionButtons[k], new Color().rgb(0x0000ff));  
+            }
           }
           return;
         }
