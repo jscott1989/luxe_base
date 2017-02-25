@@ -55,6 +55,12 @@ class SplashState extends State {
 
   override function update(dt:Float) {
     if (!stopping) {
+      if (Luxe.input.mousedown(0) || Luxe.input.mousedown(1)) {
+        stopping = true;
+        tween = Actuate.tween(splash.color, 0.2,  {a:0} )
+          .onComplete(next);
+        return;
+      }
       for (i in 0...Std.parseInt(MacroUtils.getDefinedValue("CONTROLLERS", "0"))) {
         for (k in Controls.actions_map.keys()) {
           if(Luxe.input.inputdown((i + 1) + "." + k)) {
