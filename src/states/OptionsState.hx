@@ -43,24 +43,6 @@ class OptionsState extends State {
         text_size: 56
     });
 
-    var controls_button = new mint.Button({
-      parent: canvas,
-      name: 'controls_button',
-      x: Luxe.screen.mid.x - (320 / 2), y: 0, w: 320, h: 64,
-      text: 'Controls',
-      text_size: 28,
-      options: { },
-      onclick: function(_, _) {
-        #if (CONTROLLERS==1)
-          Main.machine.set("configure_controller_state");
-        #else
-          Main.machine.set("controls_state");
-        #end
-      }
-    });
-
-    layout.margin(controls_button, title, top, fixed, title.h + 200);
-
     var back_button = new mint.Button({
       parent: canvas,
       name: 'back_button',
@@ -73,7 +55,29 @@ class OptionsState extends State {
       }
     });
 
-    layout.margin(back_button, controls_button, top, fixed, controls_button.h + 25);
+    if (Luxe.core.app.config.user.game.allow_keyboard ||
+        Luxe.core.app.config.user.game.allow_gamepad) {
+        var controls_button = new mint.Button({
+          parent: canvas,
+          name: 'controls_button',
+          x: Luxe.screen.mid.x - (320 / 2), y: 0, w: 320, h: 64,
+          text: 'Controls',
+          text_size: 28,
+          options: { },
+          onclick: function(_, _) {
+            #if (CONTROLLERS==1)
+              Main.machine.set("configure_controller_state");
+            #else
+              Main.machine.set("controls_state");
+            #end
+          }
+        });
+
+        layout.margin(controls_button, title, top, fixed, title.h + 200);
+        layout.margin(back_button, controls_button, top, fixed, controls_button.h + 25);
+      } else {
+        layout.margin(back_button, title, top, fixed, title.h + 200);
+      }
   }
 
   override function onleave<T> (_:T) {

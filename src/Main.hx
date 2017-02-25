@@ -83,12 +83,23 @@ class Main extends luxe.Game {
       if (controls_str == null) {
         Main.debug("No controls set.");
 
-        if (Controls.connected_gamepads() > 0) {
-          // A decision needs to be made
-          Main.debug("Gamepads connected. Configuring controls.");
-          machine.set('initial_controls_state');
+        if (Luxe.core.app.config.user.game.allow_keyboard &&
+            Luxe.core.app.config.user.game.allow_gamepad > 0) {
+              if (Controls.connected_gamepads() > 0) {
+                // A decision needs to be made
+                Main.debug("Gamepads connected. Configuring controls.");
+                machine.set('initial_controls_state');
+              } else {
+                Main.debug("No gamepads connected. Setting default controls.");
+                Controls.set_default_keyboard_controls();
+                init_game();
+              }
+        } else if (Luxe.core.app.config.user.game.allow_gamepad) {
+          Main.debug("Keyboard not allowed. Setting default gamepad controls.");
+          Controls.set_default_gamepad_controls();
+          init_game();
         } else {
-          Main.debug("No gamepads connected. Setting default controls.");
+          Main.debug("Gamepad not allowed. Setting default keyboard controls.");
           Controls.set_default_keyboard_controls();
           init_game();
         }

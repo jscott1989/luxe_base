@@ -1,19 +1,23 @@
 {
   "game": {
     "name": "TEMPLATE",
-    "splash_screens": 1
+    "splash_screens": 1,
+    "allow_keyboard": false,
+    "allow_gamepad": true
   },
 
-  "controls": [
-    ["Up", "up"],
-    ["Down", "down"],
-    ["Left", "left"],
-    ["Right", "right"],
-    ["Shoot", "x"],
-    ["Confirm", "a"],
-    ["Cancel", "b"],
-    ["Pause", "start"]
-  ],
+  "controls": {
+    "digital": [
+      ["Up", "up"],
+      ["Down", "down"],
+      ["Left", "left"],
+      ["Right", "right"],
+      ["Shoot", "x"],
+      ["Confirm", "a"],
+      ["Cancel", "b"],
+      ["Pause", "start"]
+    ]
+  },
 
   "window": {
     "width": 960,

@@ -19,7 +19,7 @@ class ConfigureControllerState extends State {
   var configuration: Map<String, Int>;
 
   private var highlightedButtons = new Array<String>();
-  private var bindingButton:String = null;
+  private var bindingDigital:String = null;
   private var actionButtons = new Map<String, mint.Button>();
 
 
@@ -36,8 +36,8 @@ class ConfigureControllerState extends State {
   public function refresh_interface() {
     input_device.label.text = input_device_label_text();
 
-    for (bindingButton in actionButtons.keys()) {
-      actionButtons[bindingButton].label.text = action_mapped_text(bindingButton);
+    for (b in actionButtons.keys()) {
+      actionButtons[b].label.text = action_mapped_text(b);
     }
   }
 
@@ -126,39 +126,43 @@ class ConfigureControllerState extends State {
       x:input_device_label.x + input_device_label.w, y:input_device_label.y + 2, w:260, h:32,
     });
 
-    input_device.add_item(
-      new mint.Label({
-        parent: input_device, text: 'Keyboard', align: left,
-        name: 'input_device_keyboard', w:200, h:32, text_size: 14,
-        onclick: function(_, _) {
-          if (bindingButton == null) {
-            configuration.set("type", Controls.KEYBOARD);
-            refresh_interface();
-          }
-        }
-      }),
-      10, 0
-    );
-
-    // TODO: I'd like to use Controls.connected_gamepads() but I need to know
-    // accurate IDs of which gamepads are connected. For now we'll just link
-    // to madeup IDs up to 10
-    for (i in 0...10) {
-      var p = i + 1;
+    if (Luxe.core.app.config.user.game.allow_keyboard) {
       input_device.add_item(
         new mint.Label({
-          parent: input_device, text: 'Gamepad ' + p, align: left,
-          name: 'input_device_gamepad_' + i, w:200, h:32, text_size: 14,
+          parent: input_device, text: 'Keyboard', align: left,
+          name: 'input_device_keyboard', w:200, h:32, text_size: 14,
           onclick: function(_, _) {
-            if (bindingButton == null) {
-              configuration.set("type", Controls.GAMEPAD);
-              configuration.set("gamepad_id", i);
+            if (bindingDigital == null) {
+              configuration.set("type", Controls.KEYBOARD);
               refresh_interface();
             }
           }
         }),
         10, 0
       );
+    }
+
+    if (Luxe.core.app.config.user.game.allow_gamepad) {
+      // TODO: I'd like to use Controls.connected_gamepads() but I need to know
+      // accurate IDs of which gamepads are connected. For now we'll just link
+      // to madeup IDs up to 10
+      for (i in 0...10) {
+        var p = i + 1;
+        input_device.add_item(
+          new mint.Label({
+            parent: input_device, text: 'Gamepad ' + p, align: left,
+            name: 'input_device_gamepad_' + i, w:200, h:32, text_size: 14,
+            onclick: function(_, _) {
+              if (bindingDigital == null) {
+                configuration.set("type", Controls.GAMEPAD);
+                configuration.set("gamepad_id", i);
+                refresh_interface();
+              }
+            }
+          }),
+          10, 0
+        );
+      }
     }
 
     var panel = new mint.Panel({
@@ -186,11 +190,11 @@ class ConfigureControllerState extends State {
         parent:scroll, text: action_mapped_text(k[1]), align: left,
         name: 'btn_' + k[0], w: 200, h:32, text_size: 14, x: 300, y: yoffset,
         onclick: function(_, ctrl) {
-          if (bindingButton == null) {
+          if (bindingDigital == null) {
             set_highlight_button_colours(actionButtons[k[1]], new Color().rgb(0xff0000));
 
             actionButtons.get(k[1]).label.text = "Waiting...";
-            bindingButton = k[1];
+            bindingDigital = k[1];
           }
         }
       });
@@ -239,11 +243,11 @@ class ConfigureControllerState extends State {
   }
 
   function button_press(buttonCode:Int) {
-    if (bindingButton != null) {
-      configuration.set(bindingButton, buttonCode);
-      set_default_button_colours(actionButtons[bindingButton]);
+    if (bindingDigital != null) {
+      configuration.set(bindingDigital, buttonCode);
+      set_default_button_colours(actionButtons[bindingDigital]);
       refresh_interface();
-      bindingButton = null;
+      bindingDigital = null;
     } else {
       // If the code matches a configured input, highlight it
       for (k in configuration.keys()) {
@@ -251,7 +255,7 @@ class ConfigureControllerState extends State {
           if (!(highlightedButtons.indexOf(k) > -1)) {
             if (actionButtons.exists(k)) {
               highlightedButtons.push(k);
-              set_highlight_button_colours(actionButtons[k], new Color().rgb(0x0000ff));  
+              set_highlight_button_colours(actionButtons[k], new Color().rgb(0x0000ff));
             }
           }
           return;

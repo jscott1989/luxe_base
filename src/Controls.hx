@@ -93,7 +93,7 @@ class Controls {
   }
 
   public static function get_ordered_controls() {
-    var ctrls:Array<Array<String>> = cast Luxe.core.app.config.user.controls;
+    var ctrls:Array<Array<String>> = cast Luxe.core.app.config.user.controls.digital;
     return ctrls;
   }
 
@@ -188,7 +188,7 @@ class Controls {
   }
 
   public static function init() {
-    var ctrls:Array<Array<String>> = cast Luxe.core.app.config.user.controls;
+    var ctrls:Array<Array<String>> = cast Luxe.core.app.config.user.controls.digital;
     for (c in ctrls) {
       actions_map.set(c[0], c[1]);
     }
