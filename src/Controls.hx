@@ -109,6 +109,7 @@ class Controls {
     Main.debug("Saving controls.");
     Main.debug(Json.stringify(controls, null, " "));
     Luxe.core.app.io.string_save("controls", Json.stringify(controls));
+    connect_input();
   }
 
   public static function save_controller_configuration(controller_id: Int, config: Map<String, Int>) {
