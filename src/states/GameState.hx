@@ -37,7 +37,7 @@ class GameState extends State {
 
     text3 = new Text({
       text: '',
-      pos : Luxe.screen.mid.add_xyz(100, 100, 0),
+      pos : Luxe.screen.mid.add_xyz(-100, 100, 0),
       point_size : 18,
       align: center,
       align_vertical:center
