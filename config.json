@@ -1,6 +1,7 @@
 {
   "game": {
-    "name": "TEMPLATE"
+    "name": "TEMPLATE",
+    "splash_screens": 1
   },
 
   "controls": [

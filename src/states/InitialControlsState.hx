@@ -64,7 +64,7 @@ class InitialControlsState extends State {
       options: { },
       onclick: function(_, _) {
         Controls.set_default_keyboard_controls();
-        Main.machine.set('menu_state');
+        Main.init_game();
       }
     });
 
@@ -80,7 +80,7 @@ class InitialControlsState extends State {
       options: { },
       onclick: function(_, _) {
         Controls.set_default_gamepad_controls();
-        Main.machine.set('menu_state');
+        Main.init_game();
       }
     });
 

@@ -19,6 +19,10 @@ class Main extends luxe.Game {
       }
     }
 
+    for (i in 0...Luxe.core.app.config.user.game.splash_screens) {
+      config.preload.textures.push({ id:'assets/splash' + (i + 1) + '.png' });
+    }
+
     config.window.title = config.user.game.name;
 
     config.preload.textures.push({ id:'assets/logo.png' });
@@ -64,6 +68,7 @@ class Main extends luxe.Game {
 
     // Set up game states
     machine.add(new MenuState('menu_state'));
+    machine.add(new SplashState('splash_state'));
     machine.add(new OptionsState('options_state'));
     machine.add(new InitialControlsState('initial_controls_state'));
     machine.add(new ControlsState('controls_state'));
@@ -85,17 +90,26 @@ class Main extends luxe.Game {
         } else {
           Main.debug("No gamepads connected. Setting default controls.");
           Controls.set_default_keyboard_controls();
-          machine.set('menu_state');
+          init_game();
         }
       } else {
         Main.debug("Controls set. Loading.");
         Main.debug(controls_str);
         Controls.connect_input();
-        machine.set('menu_state');
+        init_game();
       }
       #else
-        machine.set('menu_state');
+        init_game();
       #end
     });
+  }
+
+
+  public static function init_game() {
+    if (Luxe.core.app.config.user.game.splash_screens > 0) {
+      machine.set('splash_state', 1);
+    } else {
+      machine.set('menu_state');
+    }
   }
 }
