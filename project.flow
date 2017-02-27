@@ -12,20 +12,9 @@
     build: {
       dependencies: {
         luxe: '*',
-        mint : '*',
-        dconsole : '*'
+        mint : '*'
       },
       "flags": [
-        // These flags are needed
-        //"-D haxeJSON",
-
-        // Disable before release
-        // this enables the console and debug commands
-        "-debug",
-
-        // Set for number of controller-enabled players
-        // (0 if this will be mouse controlled)
-        "-D CONTROLLERS=4"
       ],
       hxcpp: {
         flags: []

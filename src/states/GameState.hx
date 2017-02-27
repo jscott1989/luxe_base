@@ -6,6 +6,9 @@ import luxe.Input.GamepadEvent;
 import luxe.Ev;
 import haxe.Json;
 
+/**
+ * Example game state. Shows controller input.
+ */
 class GameState extends State {
   var text1: Text;
   var text2: Text;
@@ -17,11 +20,11 @@ class GameState extends State {
   }
 
   override function onenter<T> (_:T) {
-    Main.debug("Enter game state");
+    trace("Enter game state");
 
     text1 = new Text({
       text: '',
-      pos : Luxe.screen.mid.add_xyz(-100, -100, 0),
+      pos : Luxe.screen.mid.add_xyz(-200, -200, 0),
       point_size : 18,
       align: center,
       align_vertical:center
@@ -29,7 +32,7 @@ class GameState extends State {
 
     text2 = new Text({
       text: '',
-      pos : Luxe.screen.mid.add_xyz(100, -100, 0),
+      pos : Luxe.screen.mid.add_xyz(200, -200, 0),
       point_size : 18,
       align: center,
       align_vertical:center
@@ -37,7 +40,7 @@ class GameState extends State {
 
     text3 = new Text({
       text: '',
-      pos : Luxe.screen.mid.add_xyz(-100, 100, 0),
+      pos : Luxe.screen.mid.add_xyz(-200, 200, 0),
       point_size : 18,
       align: center,
       align_vertical:center
@@ -45,7 +48,7 @@ class GameState extends State {
 
     text4 = new Text({
       text: '',
-      pos : Luxe.screen.mid.add_xyz(100, 100, 0),
+      pos : Luxe.screen.mid.add_xyz(200, 200, 0),
       point_size : 18,
       align: center,
       align_vertical:center
@@ -53,7 +56,7 @@ class GameState extends State {
   }
 
   override function onleave<T> (_:T) {
-    Main.debug("Leave game state");
+    trace("Leave game state");
     text1.destroy();
     text2.destroy();
     text3.destroy();
@@ -64,8 +67,12 @@ class GameState extends State {
     for (i in 1...5) {
       var _text = "";
 
-      for (k in Controls.actions_map.keys()) {
-        if(Luxe.input.inputdown(i + "." + k)) {
+      for (k in Controls.analogue_map.keys()) {
+        _text += k + ": " + Controls.analogueposition(i, k) + "\n";
+      }
+
+      for (k in Controls.digital_map.keys()) {
+        if (Controls.inputdown(i, k)) {
           _text += k + " ";
         }
       }

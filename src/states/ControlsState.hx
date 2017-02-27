@@ -8,7 +8,6 @@ import luxe.Text;
 import lib.AutoCanvas;
 import mint.focus.Focus;
 import mint.layout.margins.Margins;
-import lib.MacroUtils;
 
 import mint.render.luxe.LuxeMintRender;
 
@@ -21,7 +20,7 @@ class ControlsState extends State {
   }
 
   override function onenter<T> (_:T) {
-    Main.debug("Enter options state");
+    trace("Enter options state");
     var layout = new Margins();
 
     var a_canvas = new AutoCanvas(Luxe.camera.view, {
@@ -46,7 +45,7 @@ class ControlsState extends State {
 
     var last_button: mint.Button = null;
 
-    for (i in 0...Std.parseInt(MacroUtils.getDefinedValue("CONTROLLERS", "0"))) {
+    for (i in 0...Luxe.core.app.config.user.game.controllers) {
       var p = i + 1;
       var controller_button = new mint.Button({
         parent: canvas,
@@ -84,11 +83,7 @@ class ControlsState extends State {
   }
 
   override function onleave<T> (_:T) {
-    Main.debug("Leave controls state");
+    trace("Leave controls state");
     canvas.destroy();
-  }
-
-  override function update(dt:Float) {
-
   }
 }

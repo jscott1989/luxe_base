@@ -1,8 +1,12 @@
 package lib;
 import mint.render.luxe.Convert;
 
-/** This canvas will automatically listen to relevant luxe events, when you call auto_listen()
-    which is convenient for quickly testing things and throwing ideas around. To stop listening call auto_unlisten(). */
+/**
+  * From
+  https://github.com/snowkit/mint/blob/master/tests/test_luxe/src/AutoCanvas.hx
+  * This canvas will automatically listen to relevant luxe events,
+  * when you call auto_listen() which is convenient for quickly testing things
+  * and throwing ideas around. To stop listening call auto_unlisten(). */
 class AutoCanvas extends mint.Canvas {
 
     public var view: phoenix.Camera;

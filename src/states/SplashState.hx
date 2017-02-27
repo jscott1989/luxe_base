@@ -3,11 +3,13 @@ import luxe.States;
 import luxe.Sprite;
 import luxe.tween.Actuate;
 import luxe.Color;
-import lib.MacroUtils;
 import luxe.tween.actuators.GenericActuator;
 
 import mint.render.luxe.LuxeMintRender;
 
+/**
+ * State which shows a splash image and then moves on to the menu.
+ */
 class SplashState extends State {
 
   var splash:Sprite;
@@ -22,7 +24,7 @@ class SplashState extends State {
   override function onenter<T> (i:T) {
     stopping = false;
     n = cast i;
-    Main.debug("Enter splash state " + n);
+    trace("Enter splash state " + n);
 
 
     splash = new Sprite({
@@ -33,6 +35,7 @@ class SplashState extends State {
         color: new Color(1, 1, 1, 0)
     });
 
+    // Set up tween to fade in and then fade out
     tween = Actuate.tween(splash.color, 2,  {a:1} )
       .onComplete(function() {
         tween = Actuate.tween(splash.color, 2,  {a:0} )
@@ -41,10 +44,13 @@ class SplashState extends State {
   }
 
   override function onleave<T> (_:T) {
-    Main.debug("Leave splash state");
+    trace("Leave splash state");
     splash.destroy();
   }
 
+  /**
+   * Move on to the next splash or the main menu.
+   */
   private function next() {
       if (n == Luxe.core.app.config.user.game.splash_screens) {
         machine.set('menu_state');
@@ -54,6 +60,7 @@ class SplashState extends State {
   }
 
   override function update(dt:Float) {
+    // If we're not moving on already, check for a button press to skip.
     if (!stopping) {
       if (Luxe.input.mousedown(0) || Luxe.input.mousedown(1)) {
         stopping = true;
@@ -61,8 +68,8 @@ class SplashState extends State {
           .onComplete(next);
         return;
       }
-      for (i in 0...Std.parseInt(MacroUtils.getDefinedValue("CONTROLLERS", "0"))) {
-        for (k in Controls.actions_map.keys()) {
+      for (i in 0...Luxe.core.app.config.user.game.controllers) {
+        for (k in Controls.digital_map.keys()) {
           if(Luxe.input.inputdown((i + 1) + "." + k)) {
             stopping = true;
             tween = Actuate.tween(splash.color, 0.2,  {a:0} )

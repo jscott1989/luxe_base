@@ -8,10 +8,12 @@ import luxe.Text;
 import lib.AutoCanvas;
 import mint.focus.Focus;
 import mint.layout.margins.Margins;
-import lib.MacroUtils;
 
 import mint.render.luxe.LuxeMintRender;
 
+/**
+ * This asks the user to select keyboard or gamepad for default controls.
+ */
 class InitialControlsState extends State {
 
   var canvas: mint.Canvas;
@@ -21,7 +23,7 @@ class InitialControlsState extends State {
   }
 
   override function onenter<T> (_:T) {
-    Main.debug("Enter initial controls state");
+    trace("Enter initial controls state");
     var layout = new Margins();
 
     var a_canvas = new AutoCanvas(Luxe.camera.view, {
@@ -48,7 +50,8 @@ class InitialControlsState extends State {
         parent: canvas,
         name: 'intro',
         x:0, y:30, w:Luxe.screen.w, h:64,
-        text: 'Select your default control method. You can change this under the options menu',
+        text: 'Select your default control method.' +
+          'You can change this under the options menu',
         align:center,
         text_size: 20
     });
@@ -64,10 +67,9 @@ class InitialControlsState extends State {
       options: { },
       onclick: function(_, _) {
         Controls.set_default_keyboard_controls();
-        Main.init_game();
+        Main.first_state();
       }
     });
-
 
     layout.margin(keyboard_button, intro, top, fixed, intro.h + 200);
 
@@ -80,7 +82,7 @@ class InitialControlsState extends State {
       options: { },
       onclick: function(_, _) {
         Controls.set_default_gamepad_controls();
-        Main.init_game();
+        Main.first_state();
       }
     });
 
@@ -88,11 +90,7 @@ class InitialControlsState extends State {
   }
 
   override function onleave<T> (_:T) {
-    Main.debug("Leave initial controls state");
+    trace("Leave initial controls state");
     canvas.destroy();
-  }
-
-  override function update(dt:Float) {
-
   }
 }

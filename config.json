@@ -1,21 +1,27 @@
 {
   "game": {
     "name": "TEMPLATE",
+    "menu_text": "TEMPLATE is a game by Citizen of Mêlée",
     "splash_screens": 1,
-    "allow_keyboard": false,
+    "controllers": 4,
+    "allow_keyboard": true,
     "allow_gamepad": true
   },
 
   "controls": {
     "digital": [
-      ["Up", "up"],
-      ["Down", "down"],
-      ["Left", "left"],
-      ["Right", "right"],
       ["Shoot", "x"],
       ["Confirm", "a"],
       ["Cancel", "b"],
       ["Pause", "start"]
+    ],
+    "analogue": [
+      ["Move Horizontal", "left_analogue_stick_x", "2button"],
+      ["Move Vertical", "left_analogue_stick_y", "2button"],
+      ["Shoot Horizontal", "right_analogue_stick_x", "range"],
+      ["Shoot Vertical", "right_analogue_stick_y", "range"],
+      ["Shoot Left", "left_trigger", "1button"],
+      ["Shoot Right", "right_trigger", "1button"]
     ]
   },
 

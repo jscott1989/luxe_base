@@ -12,6 +12,9 @@ import Sys;
 
 import mint.render.luxe.LuxeMintRender;
 
+/**
+ * Main menu state.
+ */
 class MenuState extends State {
 
   var canvas: mint.Canvas;
@@ -21,7 +24,7 @@ class MenuState extends State {
   }
 
   override function onenter<T> (_:T) {
-    Main.debug("Enter menu state");
+    trace("Enter menu state");
 
     var layout = new Margins();
 
@@ -58,24 +61,26 @@ class MenuState extends State {
 
     layout.margin(play_button, image, top, fixed, image.h + 40);
 
-    #if (CONTROLLERS > 0)
-    // For now the only option we have is controls
-    // so if it's mouse/keyboard only we don't show options
-    var options_button = new mint.Button({
-      parent: canvas,
-      name: 'options_button',
-      x: Luxe.screen.mid.x - (320 / 2), y: 391, w: 320, h: 64,
-      text: 'Options',
-      text_size: 28,
-      options: { },
-      onclick: function(e,c) {
-        Main.machine.set("options_state");
-      }
-    });
+    var options_button: mint.Button = null;
 
-    layout.margin(options_button, play_button, left, fixed, 0);
-    layout.margin(options_button, play_button, top, fixed, play_button.h + 25);
-    #end
+    if (Luxe.core.app.config.user.game.controllers > 0) {
+      // For now the only option we have is controls
+      // so if it's mouse/keyboard only we don't show options
+      options_button = new mint.Button({
+        parent: canvas,
+        name: 'options_button',
+        x: Luxe.screen.mid.x - (320 / 2), y: 391, w: 320, h: 64,
+        text: 'Options',
+        text_size: 28,
+        options: { },
+        onclick: function(e,c) {
+          Main.machine.set("options_state");
+        }
+      });
+
+      layout.margin(options_button, play_button, left, fixed, 0);
+      layout.margin(options_button, play_button, top, fixed, play_button.h + 25);
+    }
 
     var exit_button = new mint.Button({
       parent: canvas,
@@ -85,36 +90,30 @@ class MenuState extends State {
       text_size: 28,
       options: { },
       onclick: function(_, _) {
-        Sys.exit(0);
+        Luxe.core.shutdown();
       }
     });
 
-    #if (CONTROLLERS > 0)
+    if (Luxe.core.app.config.user.game.controllers > 0) {
       layout.margin(exit_button, options_button, left, fixed, 0);
       layout.margin(exit_button, options_button, top, fixed, options_button.h + 25);
-    #else
+    } else {
       layout.margin(exit_button, play_button, left, fixed, 0);
       layout.margin(exit_button, play_button, top, fixed, play_button.h + 25);
-    #end
-
-    var title = Luxe.core.app.config.user.game.name;
+    }
 
     new mint.Label({
         parent: canvas,
         name: 'information',
         x:0, y:Luxe.screen.h - 64, w:Luxe.screen.w, h:32,
-        text: title + ' is a game by Citizen of Mêlée',
+        text: Luxe.core.app.config.user.game.menu_text,
         align:center,
         text_size: 14
     });
   }
 
   override function onleave<T> (_:T) {
-    Main.debug("Leave menu state");
+    trace("Leave menu state");
     canvas.destroy();
-  }
-
-  override function update(dt:Float) {
-
   }
 }

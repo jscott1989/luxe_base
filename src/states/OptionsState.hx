@@ -11,6 +11,9 @@ import mint.layout.margins.Margins;
 
 import mint.render.luxe.LuxeMintRender;
 
+/**
+ * Options State.
+ */
 class OptionsState extends State {
 
   var canvas: mint.Canvas;
@@ -20,7 +23,7 @@ class OptionsState extends State {
   }
 
   override function onenter<T> (_:T) {
-    Main.debug("Enter options state");
+    trace("Enter options state");
     var layout = new Margins();
 
     var a_canvas = new AutoCanvas(Luxe.camera.view, {
@@ -65,11 +68,11 @@ class OptionsState extends State {
           text_size: 28,
           options: { },
           onclick: function(_, _) {
-            #if (CONTROLLERS==1)
+            if (Luxe.core.app.config.user.game.controllers  == 1) {
               Main.machine.set("configure_controller_state");
-            #else
+            } else {
               Main.machine.set("controls_state");
-            #end
+            }
           }
         });
 
@@ -81,11 +84,7 @@ class OptionsState extends State {
   }
 
   override function onleave<T> (_:T) {
-    Main.debug("Leave options state");
+    trace("Leave options state");
     canvas.destroy();
-  }
-
-  override function update(dt:Float) {
-
   }
 }
