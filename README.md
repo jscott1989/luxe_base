@@ -6,4 +6,3 @@ for specific games.
 
 Installed libraries:
   Mint (UI)
-  DConsole (Debugging)
