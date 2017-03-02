@@ -305,7 +305,7 @@ class Controls {
    * Set the first controller to use keyboard and others to use gamepads.
    */
   public static function set_default_keyboard_controls() {
-    trace("Setting default keypad controls.");
+    trace("Setting default keyboard controls.");
     var controls = new Array<ControlConfiguration>();
     controls.push(default_controls.get("keyboard").clone());
     for (i in 0...Std.int(Luxe.core.app.config.user.game.controllers - 1)) {
