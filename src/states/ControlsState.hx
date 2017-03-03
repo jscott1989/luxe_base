@@ -14,6 +14,7 @@ import mint.render.luxe.LuxeMintRender;
 class ControlsState extends State {
 
   var canvas: mint.Canvas;
+  var focus: ControllerFocus;
 
   public function new(name:String) {
     super({ name:name });
@@ -32,7 +33,9 @@ class ControlsState extends State {
     a_canvas.auto_listen();
 
     canvas = a_canvas;
-    var focus = new Focus(canvas);
+    focus = new ControllerFocus(canvas, function() {
+      Main.machine.set("options_state");
+    });
 
     var title = new mint.Label({
         parent: canvas,
@@ -85,5 +88,9 @@ class ControlsState extends State {
   override function onleave<T> (_:T) {
     trace("Leave controls state");
     canvas.destroy();
+  }
+
+  override function update(elapsed:Float) {
+    focus.update(elapsed);
   }
 }

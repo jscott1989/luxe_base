@@ -6,7 +6,6 @@ import luxe.Vector;
 import luxe.Input;
 import luxe.Text;
 import lib.AutoCanvas;
-import mint.focus.Focus;
 import mint.layout.margins.Margins;
 import Sys;
 
@@ -18,6 +17,7 @@ import mint.render.luxe.LuxeMintRender;
 class MenuState extends State {
 
   var canvas: mint.Canvas;
+  var focus: ControllerFocus;
 
   public function new(name:String) {
     super({ name:name });
@@ -37,7 +37,7 @@ class MenuState extends State {
     a_canvas.auto_listen();
 
     canvas = a_canvas;
-    var focus = new Focus(canvas);
+    focus = new ControllerFocus(canvas);
 
     var image = new mint.Image({
         parent: canvas, name: 'logo',
@@ -115,5 +115,9 @@ class MenuState extends State {
   override function onleave<T> (_:T) {
     trace("Leave menu state");
     canvas.destroy();
+  }
+
+  override function update(elapsed:Float) {
+    focus.update(elapsed);
   }
 }

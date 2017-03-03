@@ -1,6 +1,7 @@
 import luxe.Input;
 import haxe.Json;
 import snow.types.Types;
+import haxe.Timer;
 
 /**
  * This represents a single configuration of a single controller.
@@ -248,6 +249,15 @@ class Controls {
     _connected_gamepads -= 1;
   }
 
+  public static function get_menu_movement_controls() {
+    var ctrls:Array<Array<String>> = cast Luxe.core.app.config.user.controls.menu.movement;
+    return ctrls;
+  }
+
+  public static function get_menu_buttons() {
+    return Luxe.core.app.config.user.controls.menu.buttons;
+  }
+
   /**
    * Get an array of digital controls.
    * Each will be an array, with the first element the name of the control,
@@ -432,6 +442,12 @@ class Controls {
     return Luxe.input.inputdown(controller_id + "." + action);
   }
 
+  public static function throttleinputdown(timeout:Float,
+                                           controller_id: Int, action:String) {
+    return throttle("inputdown(" + controller_id + ", " + action + ")", timeout,
+                    inputdown(controller_id, action));
+  }
+
   /**
    * Get the position of an alagoue input
    * (typically the range is -1 to 1, or 0 to 1)
@@ -465,5 +481,24 @@ class Controls {
     var n:Int = controls[controller_id - 1].get_analogue(analogue_map.get(name)[0]);
 
     return Luxe.core.app.input.gamepadaxis(gamepad_id, n);
+  }
+
+  private static var throttle_timeouts = new Map<String, Float>();
+
+  /**
+   * For a given key, this will only return true once every timeout seconds.
+   */
+  public static function throttle(key:String, timeout:Float, value:Bool) {
+    if (value && !throttle_timeouts.exists(key)) {
+      throttle_timeouts[key] = Timer.stamp() + timeout;
+      return true;
+    } else if (!value && throttle_timeouts.exists(key)) {
+      throttle_timeouts.remove(key);
+      return false;
+    } else if (value && throttle_timeouts.exists(key) && Timer.stamp() >= throttle_timeouts[key]) {
+      throttle_timeouts[key] = Timer.stamp() + timeout;
+      return true;
+    }
+    return false;
   }
 }

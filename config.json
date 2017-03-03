@@ -9,7 +9,21 @@
   },
 
   "controls": {
+    "menu": {
+      "movement": [
+        ["analogue", "Move Horizontal", "Move Vertical"],
+        ["digital", "Left", "Right", "Up", "Down"]
+      ],
+      "buttons": {
+        "click": "Confirm",
+        "cancel": "Cancel"
+      }
+    },
     "digital": [
+      ["Up", "up"],
+      ["Down", "down"],
+      ["Left", "left"],
+      ["Right", "right"],
       ["Shoot", "x"],
       ["Confirm", "a"],
       ["Cancel", "b"],

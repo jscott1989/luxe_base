@@ -28,6 +28,7 @@ class ConfigureControllerState extends State {
 
   // Interface elements
   var canvas: mint.Canvas;
+  var focus: ControllerFocus;
   var input_device:mint.Dropdown;
   var scroll:mint.Scroll;
   private var actionButtons = new Map<String, mint.Button>();
@@ -218,7 +219,7 @@ class ConfigureControllerState extends State {
     a_canvas.auto_listen();
 
     canvas = a_canvas;
-    var focus = new Focus(canvas);
+    focus = new ControllerFocus(canvas);
 
     var title = new mint.Label({
         parent: canvas,
@@ -349,7 +350,7 @@ class ConfigureControllerState extends State {
       for (k in configuration.digital_keys()) {
         if (configuration.get_digital(k) == buttonCode) {
           if (!(highlightedButtons.indexOf(k) > -1)) {
-            if (actionButtons.exists(k)) {
+            if (actionButtons.exists(k + "_0")) {
               highlightedButtons.push(k);
               set_highlight_button_colours(actionButtons[k + "_0"],
                 new Color().rgb(0x0000ff));
