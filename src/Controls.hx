@@ -254,6 +254,10 @@ class Controls {
     return ctrls;
   }
 
+  public static function get_gameplay_controls() {
+    return Luxe.core.app.config.user.controls.gameplay;
+  }
+
   public static function get_menu_buttons() {
     return Luxe.core.app.config.user.controls.menu.buttons;
   }

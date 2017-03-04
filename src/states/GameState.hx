@@ -10,6 +10,8 @@ import haxe.Json;
  * Example game state. Shows controller input.
  */
 class GameState extends State {
+  var state_machine : States;
+
   var text1: Text;
   var text2: Text;
   var text3: Text;
@@ -17,6 +19,9 @@ class GameState extends State {
 
   public function new(name:String) {
     super({name:name});
+
+    state_machine = new States({ name:'statemachine' });
+    state_machine.add(new PauseState('pause', resume));
   }
 
   override function onenter<T> (_:T) {
@@ -63,7 +68,27 @@ class GameState extends State {
     text4.destroy();
   }
 
+  function pause() {
+    state_machine.set('pause');
+  }
+
+  function resume() {
+    state_machine.unset();
+  }
+
   override function update( dt:Float ) {
+    if (state_machine.current_state != null &&
+        state_machine.current_state.name == "pause") {
+          // We don't do anything while paused
+          return;
+    }
+
+    for (i in 1...Luxe.core.app.config.user.game.controllers) {
+      if (Controls.throttleinputdown(1, i, Controls.get_gameplay_controls().pause)) {
+        pause();
+      }
+    }
+
     for (i in 1...5) {
       var _text = "";
 

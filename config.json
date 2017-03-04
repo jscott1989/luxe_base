@@ -19,6 +19,9 @@
         "cancel": "Cancel"
       }
     },
+    "gameplay": {
+      "pause": "Pause"
+    },
     "digital": [
       ["Up", "up"],
       ["Down", "down"],

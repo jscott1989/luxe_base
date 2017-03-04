@@ -204,6 +204,8 @@ class ConfigureControllerState extends State {
    * Initialise the state.
    */
   override function onenter<T> (c:T) {
+    // TODO: Check if gamepads are enabled and give advice if not
+
     controller_id = cast c;
     actionButtons = new Map<String, mint.Button>();
     trace("Enter configure controller state");
