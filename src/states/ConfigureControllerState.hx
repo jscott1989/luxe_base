@@ -101,7 +101,7 @@ class ConfigureControllerState extends State {
     }
 
     for (k in Controls.get_ordered_analogue_controls()) {
-      if (configuration.get_type() == Controls.KEYBOARD) {
+      if (configuration.get_type() == ControllerType.KEYBOARD) {
         switch (k[2]) {
           case "1button": {
             create_action_button(k[1], analogue_mapped_text(k[1]), yoffset,
@@ -159,8 +159,8 @@ class ConfigureControllerState extends State {
    */
   private function input_device_label_text() {
     switch (configuration.get_type()) {
-      case Controls.KEYBOARD: return "Keyboard";
-      case Controls.GAMEPAD: return "Gamepad " + (
+      case ControllerType.KEYBOARD: return "Keyboard";
+      case ControllerType.GAMEPAD: return "Gamepad " + (
         configuration.get_gamepad_id() + 1);
       default: return "Input Device";
     }
@@ -170,7 +170,7 @@ class ConfigureControllerState extends State {
    * Give the text name for the given analogue input.
    */
   private function analogue_mapped_text(action:String, index:Int = 0) {
-    if (configuration.get_type() == Controls.KEYBOARD) {
+    if (configuration.get_type() == ControllerType.KEYBOARD) {
       var p = configuration.get_analogue(action)[index];
       return Keycodes.name(p).toUpperCase();
     }
@@ -188,7 +188,7 @@ class ConfigureControllerState extends State {
    * Give the text name for the given button.
    */
   private function digital_mapped_text(action:String) {
-    if (configuration.get_type() == Controls.KEYBOARD) {
+    if (configuration.get_type() == ControllerType.KEYBOARD) {
       var p = configuration.get_digital(action);
       return Keycodes.name(p).toUpperCase();
     }
@@ -255,7 +255,7 @@ class ConfigureControllerState extends State {
           name: 'input_device_keyboard', w:200, h:32, text_size: 14,
           onclick: function(_, _) {
             if (bindingDigital == null && bindingAnalogue == null) {
-              configuration.set_type(Controls.KEYBOARD);
+              configuration.set_type(ControllerType.KEYBOARD);
               refresh_interface();
             }
           }
@@ -276,7 +276,7 @@ class ConfigureControllerState extends State {
             name: 'input_device_gamepad_' + i, w:200, h:32, text_size: 14,
             onclick: function(_, _) {
               if (bindingDigital == null && bindingAnalogue == null) {
-                configuration.set_type(Controls.GAMEPAD);
+                configuration.set_type(ControllerType.GAMEPAD);
                 configuration.set_gamepad_id(i);
                 refresh_interface();
               }
@@ -338,7 +338,7 @@ class ConfigureControllerState extends State {
       refresh_interface();
       bindingDigital = null;
     } else if (bindingAnalogue != null
-        && configuration.get_type() == Controls.KEYBOARD) {
+        && configuration.get_type() == ControllerType.KEYBOARD) {
       // Doing analogue binding on the keyboard
       var a = configuration.get_analogue(bindingAnalogue);
       a[bindingAnalogueIndex] = buttonCode;
@@ -381,7 +381,7 @@ class ConfigureControllerState extends State {
   }
 
   override function onkeydown(e:KeyEvent) {
-    if (configuration.get_type() == Controls.KEYBOARD) {
+    if (configuration.get_type() == ControllerType.KEYBOARD) {
       button_press(e.keycode);
     }
   }
@@ -391,14 +391,14 @@ class ConfigureControllerState extends State {
   }
 
   override function ongamepaddown(e:GamepadEvent) {
-      if (configuration.get_type() == Controls.GAMEPAD &&
+      if (configuration.get_type() == ControllerType.GAMEPAD &&
           configuration.get_gamepad_id() == e.gamepad) {
         button_press(e.button);
       }
   }
 
   override function ongamepadup(e:GamepadEvent) {
-    if (configuration.get_type() == Controls.GAMEPAD &&
+    if (configuration.get_type() == ControllerType.GAMEPAD &&
         configuration.get_gamepad_id() == e.gamepad) {
       button_release(e.button);
     }
@@ -414,7 +414,7 @@ class ConfigureControllerState extends State {
     if (bindingAnalogue != null) {
       var max_difference_i = 0;
       var max_difference = 0.0;
-      if (configuration.get_type() == Controls.GAMEPAD) {
+      if (configuration.get_type() == ControllerType.GAMEPAD) {
 
         if (analogue_values == null) {
           analogue_values = new Map<Int, Float>();

@@ -112,6 +112,12 @@ class ControlConfiguration {
   }
 }
 
+class ControllerType {
+  // Controllers are either keyboards or gamepads
+  public static inline var KEYBOARD = 0;
+  public static inline var GAMEPAD = 1;
+}
+
 /**
  * Controls abstracts away all controller configuration.
  *
@@ -120,14 +126,10 @@ class ControlConfiguration {
  */
 class Controls {
 
-  // Controllers are either keyboards or gamepads
-  public static inline var KEYBOARD = 0;
-  public static inline var GAMEPAD=1;
-
   // The default configurations for different controller types
   public static var default_controls = [
     'keyboard'=> ControlConfiguration.create(
-      KEYBOARD,
+      ControllerType.KEYBOARD,
       [
         'up'=>Key.key_w,
         'down'=>Key.key_s,
@@ -155,7 +157,7 @@ class Controls {
       ]
     ),
     '360'=> ControlConfiguration.create(
-      GAMEPAD,
+      ControllerType.GAMEPAD,
       [
         'up'=>11,
         'down'=>12,
@@ -392,9 +394,9 @@ class Controls {
     // Connect up each one
     for (i in 0...controls.length) {
       if (controls[i] != null) {
-        if (controls[i].get_type() == KEYBOARD) {
+        if (controls[i].get_type() == ControllerType.KEYBOARD) {
           connect_keyboard_input(i + 1, controls[i]);
-        } else if (controls[i].get_type() == GAMEPAD) {
+        } else if (controls[i].get_type() == ControllerType.GAMEPAD) {
           connect_gamepad_input(i + 1, controls[i]);
         }
       }
@@ -457,7 +459,7 @@ class Controls {
    * (typically the range is -1 to 1, or 0 to 1)
    */
   public static function analogueposition(controller_id: Int, name:String) {
-    if (controls[controller_id - 1].get_type() == KEYBOARD) {
+    if (controls[controller_id - 1].get_type() == ControllerType.KEYBOARD) {
       switch (analogue_map.get(name)[1]) {
         case "1button": {
           if (Luxe.input.inputdown(controller_id + "._" + name)) {
