@@ -86,8 +86,9 @@ class ConfigureControllerState extends State {
     input_device.label.text = input_device_label_text();
 
     // Remove all old action buttons
-    for (b in actionButtons) {
-      b.destroy();
+    for (b in actionButtons.keys()) {
+      actionButtons.get(b).destroy();
+      actionButtons.remove(b);
     }
 
     // Add new buttons
