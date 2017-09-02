@@ -7,8 +7,7 @@ import haxe.Timer;
  * This represents a single configuration of a single controller.
  */
 class ControlConfiguration {
-  // can be Controls.KEYBOARD or Controls.GAMEPAD
-  var type:Int;
+  var type:ControllerType;
   // 0 if keyboard, otherwise the id of the gamepad
   var gamepad_id:Int;
   // Digital buttons
@@ -33,7 +32,7 @@ class ControlConfiguration {
   /**
    * Create a new configuration.
    */
-  public static function create(type, digital: Map<String, Int>, analogue: Map<String, Dynamic>, gamepad_id:Int = null) {
+  public static function create(type: ControllerType, digital: Map<String, Int>, analogue: Map<String, Dynamic>, gamepad_id:Int = null) {
     var c = new ControlConfiguration(type);
     c.set_gamepad_id(gamepad_id);
     for (l in digital.keys()) {
@@ -49,7 +48,11 @@ class ControlConfiguration {
    * Create a configuration from an object loaded from JSON
    */
   public static function fromJSON(json: Dynamic) {
-    var c = new ControlConfiguration(json.type);
+    var type = ControllerType.KEYBOARD;
+    if (json.type == 1) {
+      type = ControllerType.GAMEPAD;
+    }
+    var c = new ControlConfiguration(type);
     c.set_gamepad_id(json.gamepad_id);
     for (i in Reflect.fields(json.digital)) {
       c.set_digital(i, Reflect.field(json.digital, i));
@@ -60,7 +63,7 @@ class ControlConfiguration {
     return c;
   }
 
-  public function new(type:Int) {
+  public function new(type:ControllerType) {
     this.type = type;
   }
 
@@ -103,7 +106,7 @@ class ControlConfiguration {
     return gamepad_id;
   }
 
-  public function set_type(type:Int) {
+  public function set_type(type:ControllerType) {
     this.type = type;
   }
 
@@ -112,10 +115,9 @@ class ControlConfiguration {
   }
 }
 
-class ControllerType {
-  // Controllers are either keyboards or gamepads
-  public static inline var KEYBOARD = 0;
-  public static inline var GAMEPAD = 1;
+enum ControllerType {
+  KEYBOARD;
+  GAMEPAD;
 }
 
 /**
