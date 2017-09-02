@@ -48,10 +48,8 @@ class ControlConfiguration {
    * Create a configuration from an object loaded from JSON
    */
   public static function fromJSON(json: Dynamic) {
-    var type = ControllerType.KEYBOARD;
-    if (json.type == 1) {
-      type = ControllerType.GAMEPAD;
-    }
+    var type = (json.type == 1) ? ControllerType.GAMEPAD : ControllerType.KEYBOARD;
+    
     var c = new ControlConfiguration(type);
     c.set_gamepad_id(json.gamepad_id);
     for (i in Reflect.fields(json.digital)) {
